@@ -1,0 +1,80 @@
+.form-wrapper  {
+    min-height: calc(100vh - 40px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-box  {
+    background-color: #ced4da;
+    border: 2px solid #343a40;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 8px 20px #adb5bd;
+}
+
+.login h2, .login p {
+    text-align: center;
+    color: black;
+    margin-bottom: 24px;
+}
+
+.login p {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.login input, .login select {
+    padding: 8px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+input:focus, select:focus {
+    border-color: #343a40;
+    outline: none;
+    box-shadow: 0 0 5px #343a40;
+}
+
+.login input,
+.login select,
+.login button {
+    width: 55%;
+    margin-bottom: 16px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.login input,
+.login select,
+.login button {
+}
+
+.login button {
+    display: block;
+    width: auto;
+    margin: 0 auto 16px auto;
+}
+
+
+.login button {
+
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #495057;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.login button:hover {
+    background-color: #212529;
+}
+
