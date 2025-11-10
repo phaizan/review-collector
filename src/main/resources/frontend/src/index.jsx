@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Auth from "./Pages/Auth";
-import Main from "./Pages/Main";
+import Auth from "./pages/Auth";
+import Main from "./pages/Main";
 import {AuthProvider, useAuth} from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 

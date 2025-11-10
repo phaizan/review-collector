@@ -5,8 +5,11 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
 
+    const USER_DATA_SESSION_KEY = "UserData";
+
     const [user, setUser] = useState(() => {
-        const saved = localStorage.getItem("user");
+        const saved = localStorage.getItem(USER_DATA_SESSION_KEY);
+        console.log("Пользователь", saved);
         return saved ? JSON.parse(saved) : null;
     });
 
@@ -14,12 +17,12 @@ export const AuthProvider = ({ children }) => {
 
     const saveUser = (userData) => {
         setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem(USER_DATA_SESSION_KEY, JSON.stringify(userData));
     };
 
     const removeUser = () => {
         setUser(null);
-        localStorage.removeItem("user");
+        localStorage.removeItem(USER_DATA_SESSION_KEY);
         navigate("/");
     };
 

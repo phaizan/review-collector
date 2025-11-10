@@ -6,9 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.reviewscollector.dto.LoginRequestDTO;
-import study.reviewscollector.dto.UserDTO;
+import study.reviewscollector.dto.AuthResponse;
 import study.reviewscollector.entity.User;
 import study.reviewscollector.repository.UserRepository;
+import study.reviewscollector.util.JwtUtil;
 
 
 @RestController
@@ -19,8 +20,9 @@ import study.reviewscollector.repository.UserRepository;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    @PostMapping("registration")
+    @PostMapping("/registration")
     public ResponseEntity<?> registr (@RequestBody User user) {
 
         if(userRepository.getUserByLogin(user.getLogin()) != null) {
@@ -29,23 +31,27 @@ public class UserController {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(new UserDTO()
-                .setId(user.getId())
-                .setName(user.getName()));
+        return ResponseEntity.ok(user.getName());
     }
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<?> login (@RequestBody LoginRequestDTO loginRequestDTO) {
 
         User user = userRepository.getUserByLogin(loginRequestDTO.getLogin());
+
         if (user == null || !user.getPassword().equals(loginRequestDTO.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Введен неправильный логин и пароль");
         }
 
-        return ResponseEntity.ok(new UserDTO()
-                .setId(user.getId())
-                .setName(user.getName()));
+        String token = jwtUtil.generateToken(user);
 
+        return ResponseEntity.ok(AuthResponse.builder()
+                .token(token)
+                .login(user.getLogin())
+                .name(user.getName())
+                .build());
     }
+
+
 
 }

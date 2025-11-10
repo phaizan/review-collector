@@ -25,9 +25,17 @@ public class ParserController {
                 .toList();
 
         List<ParsedData> results = tasks.stream()
-                .map(CompletableFuture::join)
-                .toList();
-
+                .map(task -> {
+                    try {
+                        return task.join();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }).toList();
         return ResponseEntity.ok(results);
     }
+
+
+
 }

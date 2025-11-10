@@ -10,9 +10,9 @@ const Auth = () => {
     const navigate = useNavigate();
     const { user, saveUser } = useAuth();
     const [message, setMessage] = useState(String);
-    const [newUser, setNewUser] = useState({ name: null, login: null, password: null});
+    const [newUser, setNewUser] = useState({ name: '', login: '', password: ''});
     const [showLoginFrom, setShowLoginFrom] = useState(true);
-    const [loginRequest, setLoginRequest] = useState({login: null, password: null});
+    const [loginRequest, setLoginRequest] = useState({login: '', password: ''});
     const loginFields= [
         {type: 'text', name: 'login', placeholder: "Логин"},
         {type: 'password', name: 'password', placeholder: "Пароль"},
@@ -30,61 +30,6 @@ const Auth = () => {
         }
     }, [user, navigate]);
 
-
-    /* const login = async () => {
-         if (!loginRequest.login.trim()) {
-             setMessage('Введите логин');
-             setMessageId(2);
-             return;
-         }
-         console.log(loginRequest);
-         try {
-             const response = await axios.post(
-                 'http://localhost:8080/api/user/login',
-                 loginRequest
-             );
-             const loggedUser = response.data;
-             setUser(loggedUser);
-             setLoginRequest({});
-             setShowLoginFrom(true);
-             if (loggedUser.roleId === 1)
-                 navigate('/employee')
-             if (loggedUser.roleId === 2 || loggedUser.roleId === 3)
-                 navigate('/storekeeper')
-         }
-         catch (e) {
-             console.error(e);
-             setMessage(e?.response?.data || "Ошибка при авторизации");
-             setMessageId(1);
-         }
-     }
-
-
-
-
-
-     useEffect(() => {
-         if (user?.name) {
-             if (user.roleId === 1)
-                 navigate('/employee')
-             if (user.roleId === 2 || user.roleId === 3)
-                 navigate('/storekeeper')
-             setHello(`${user.name}`);
-         }
-
-         const fetchRoles = async () => {
-             try {
-                 const response = await axios.get('http://localhost:8080/api/user/roles');
-                 setRoles(response.data);
-                 console.log(response.data)
-             }
-             catch (e) {
-                 console.error('Ошибка при загрузке ролей', e);
-                 return [];
-             }
-         }
-         fetchRoles();
-     }, [user])*/
     const login = async () => {
         if (!loginRequest.login.trim()) {
             return;
@@ -93,12 +38,13 @@ const Auth = () => {
         try {
             const response = await axios.post(
                 'http://localhost:8080/api/user/login',
-                loginRequest
+                loginRequest,
             );
-            const loggedUser = response.data;
-            console.log(loggedUser);
-            console.log("Вызываю сохранение");
 
+            const loggedUser = response.data;
+            const {token} = response.data;
+            localStorage.setItem('token', token)
+            console.log("Токен", token);
             saveUser(loggedUser);
             navigate('/main');
         }
