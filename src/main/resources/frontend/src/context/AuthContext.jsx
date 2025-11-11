@@ -13,6 +13,16 @@ export const AuthProvider = ({ children }) => {
         return saved ? JSON.parse(saved) : null;
     });
 
+    const getToken = () => {
+        const saved = localStorage.getItem(USER_DATA_SESSION_KEY);
+        try {
+            return saved ? JSON.parse(saved).token : null;
+        }
+        catch {
+            return null;
+        }
+    };
+
     const navigate = useNavigate();
 
     const saveUser = (userData) => {
@@ -27,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, saveUser, removeUser }}>
+        <AuthContext.Provider value={{ user, saveUser, removeUser, getToken }}>
             {children}
         </AuthContext.Provider>
     );

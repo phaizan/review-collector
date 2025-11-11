@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Builder
 public class AuthResponse {
-    private String token;
     private String login;
     private String name;
+    private String token;
 }

@@ -8,6 +8,8 @@ import study.reviewscollector.repository.TemplateRepository;
 import study.reviewscollector.repository.UserRepository;
 import study.reviewscollector.util.JwtUtil;
 
+import java.util.List;
+
 //TODO Spring Security?
 
 @Service
@@ -15,21 +17,26 @@ import study.reviewscollector.util.JwtUtil;
 public class TemplateService {
 
     private final TemplateRepository templateRepository;
-    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
     public void save(NewTemplateDTO templateDTO, String token) {
 
         String login = jwtUtil.extractLogin(token);
-        Integer id = userRepository.getUserByLogin(login).getId();
 
         Template template = Template.builder()
                 .name(templateDTO.getName())
                 .links(templateDTO.getLinks())
-                .userId(id)
+                .userLogin(login)
                 .build();
 
 
         templateRepository.save(template);
+    }
+
+    public List<Template> getAllByUserId(String token) {
+        String login = jwtUtil.extractLogin(token);
+        return templateRepository.getTemplatesByUserLogin(login);
+
+
     }
 }

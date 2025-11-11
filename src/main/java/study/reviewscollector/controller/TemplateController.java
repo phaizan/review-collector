@@ -17,9 +17,9 @@ public class TemplateController {
 
 
     @GetMapping("get")
-    public ResponseEntity<?> getTemplates() {
-
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getTemplates(@RequestHeader("Authorization") String token) {
+        token = token.replace("Bearer ", "");
+        return ResponseEntity.ok(service.getAllByUserId(token));
     }
 
     @PostMapping("save")

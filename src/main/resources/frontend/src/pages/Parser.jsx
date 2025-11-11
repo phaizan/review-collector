@@ -1,20 +1,26 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import  '../styles/modal.css';
+import {useAuth} from "../context/AuthContext";
 
 
 const Parser = () => {
     const [isParsing, setIsParsing] = useState(false);
+    const { getToken } = useAuth();
+    const [message, setMessage] = useState("");
     const [parseResults, setParseResults] = useState([]);
     const [templates, setTemplates] = useState([""]);
     const [template, setTemplate] = useState("");
     const [modal, setModal] = useState(false);
+    const [links, setLinks] = useState([""]);
 
 
-    const parse = async (e) => {
+    const parse = async () => {
         try {
+            setParseResults([]);
             setIsParsing(true);
-            const linksArr = e.target.links.value.split('\n').map(l => l.trim()).filter(l => l);
+            console.log(links);
+            const linksArr = links.split('\n').map(l => l.trim()).filter(l => l);
             const response = await axios.post('http://localhost:8080/api/parser/run', linksArr)
             console.log(response.data);
             setIsParsing(false);
@@ -64,21 +70,26 @@ const Parser = () => {
         if (e === "create")
             setModal(true);
         else {
-            console.log("Загружаю шаблон...")
+            console.log(e);
+            const links = e.split(',');
+            setLinks(links.join('\n'));
+            console.log(links);
         }
     }
 
     const createTemplate = async (e) => {
 
+        setModal(false);
         const links = e.target.tmpLinks.value.split('\n').map(l => l.trim()).filter(l => l);
         const name = e.target.name.value;
+        setMessage(`Шаблон ${e.target.name.value} с ${links.length} ссылок создан`);
         try {
             const response = await axios.post(
                 'http://localhost:8080/api/template/save',
                 {
                     name: name,
                     links: links
-                },{ headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}}
+                },{ headers: {Authorization: `Bearer ${getToken()}`}}
             );
             console.log(response);
         }
@@ -89,9 +100,12 @@ const Parser = () => {
 
     useEffect(() => {
 
-        const getRoles = async () => {
+        console.log("ВЫзов")
+        const getTemplates = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/template/get');
+                const response = await axios.get(
+                    'http://localhost:8080/api/template/get',
+                    { headers: {Authorization: `Bearer ${getToken()}`}});
                 setTemplates(response.data);
             }
             catch (e) {
@@ -99,11 +113,12 @@ const Parser = () => {
                 return [];
             }
         }
-        getRoles();
-        },[])
+        getTemplates();
+        },[!modal])
 
     return (
-        <div >
+        <div>
+            {message}
             <form onSubmit={(e) => {
                 e.preventDefault();
                 parse(e);
@@ -111,19 +126,17 @@ const Parser = () => {
                 <div>Введите список ссылок</div>
                 <textarea
                 rows={10}
+                onChange={e => setLinks(e.target.value)}
                 cols={50}
-                name="links"
+                value={links}
                 placeholder="Список ссылок"/>
                 <button type="submit">parse</button>
                 <select
-                    value={template}
                     onChange={e => handleTemplateChange(e.target.value)}>
                     <option value="">Выберите шаблон</option>
                     {templates.map(t => (
-                        <option key={t.id} value={t.id}>{t.name}</option>
+                        <option key={t.id} value={t.links}>{t.name}</option>
                     ))}
-                    <option value="5">Крутой шаблон</option>
-
                     <option value="create">Создать новый</option>
 
                 </select>

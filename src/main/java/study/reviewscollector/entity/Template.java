@@ -22,7 +22,7 @@ public class Template {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer userId;
+    private String userLogin;
     private String name;
     private Set<String> links = new HashSet<>();
 

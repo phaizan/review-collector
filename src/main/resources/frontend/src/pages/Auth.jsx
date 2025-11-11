@@ -42,9 +42,8 @@ const Auth = () => {
             );
 
             const loggedUser = response.data;
-            const {token} = response.data;
-            localStorage.setItem('token', token)
-            console.log("Токен", token);
+           /* const {token} = response.data;
+            localStorage.setItem('token', token)*/
             saveUser(loggedUser);
             navigate('/main');
         }
