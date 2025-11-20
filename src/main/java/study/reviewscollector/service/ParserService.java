@@ -42,7 +42,7 @@ public class ParserService {
     );
 
     @Async
-    public CompletableFuture<ParsedData> parse(String url) {
+    public CompletableFuture<ParsedData> parse(String url, String userLogin) {
         try {
             String randomAgent = USER_AGENTS.get(new Random().nextInt(USER_AGENTS.size()));
             String randomReferer = REFFER_FROM.get(new Random().nextInt(REFFER_FROM.size()));
@@ -66,6 +66,7 @@ public class ParserService {
                     .rating(rating)
                     .reviewsCount(reviewsCount)
                     .parsedAt(LocalDateTime.now())
+                    .userLogin(userLogin)
                     .build();
 
             repository.save(parsedData);

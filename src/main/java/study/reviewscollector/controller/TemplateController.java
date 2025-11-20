@@ -18,14 +18,12 @@ public class TemplateController {
 
     @GetMapping("get")
     public ResponseEntity<?> getTemplates(@RequestHeader("Authorization") String token) {
-        token = token.replace("Bearer ", "");
         return ResponseEntity.ok(service.getAllByUserId(token));
     }
 
     @PostMapping("save")
     public ResponseEntity<?> saveTemplate(@RequestBody NewTemplateDTO templateDTO, @RequestHeader("Authorization") String token) {
 
-        token = token.replace("Bearer ", "");
         service.save(templateDTO, token);
 
         return ResponseEntity.ok().build();

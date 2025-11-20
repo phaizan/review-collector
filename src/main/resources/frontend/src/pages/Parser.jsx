@@ -10,7 +10,6 @@ const Parser = () => {
     const [message, setMessage] = useState("");
     const [parseResults, setParseResults] = useState([]);
     const [templates, setTemplates] = useState([""]);
-    const [template, setTemplate] = useState("");
     const [modal, setModal] = useState(false);
     const [links, setLinks] = useState([""]);
 
@@ -21,7 +20,11 @@ const Parser = () => {
             setIsParsing(true);
             console.log(links);
             const linksArr = links.split('\n').map(l => l.trim()).filter(l => l);
-            const response = await axios.post('http://localhost:8080/api/parser/run', linksArr)
+            const response = await axios.post(
+                'http://localhost:8080/api/parser/run',
+                linksArr,
+                { headers: {Authorization: `Bearer ${getToken()}`}}
+            );
             console.log(response.data);
             setIsParsing(false);
             setParseResults(response.data)

@@ -11,7 +11,8 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "parsed_data")
+@Table(name = "" +
+        "parsed_data")
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,8 +25,14 @@ public class ParsedData {
     private Integer id;
 
     private String url;
+
     private String source;
+
     private Double rating;
+
     private Integer reviewsCount;
+
     private LocalDateTime parsedAt;
+
+    private String userLogin;
 }
