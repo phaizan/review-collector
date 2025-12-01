@@ -37,7 +37,8 @@ const Auth = () => {
 
         try {
             const response = await axios.post(
-                'http://localhost:8080/api/user/login',
+                '/api/user/login',
+                //'http://localhost:8080/api/user/login',
                 loginRequest,
             );
 
@@ -55,9 +56,9 @@ const Auth = () => {
 
     const registr = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/api/user/registration', newUser);
+            const response = await axios.post('/api/user/registration', newUser);
             console.log(response);
-            setMessage(`Пользователь ${response.data.name} зарегистрирован`);
+            setMessage(`Пользователь ${response.data} зарегистрирован`);
             setShowLoginFrom(true);
         }
         catch (e) {

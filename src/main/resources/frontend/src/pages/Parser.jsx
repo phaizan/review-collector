@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {use, useEffect, useState} from 'react';
 import axios from "axios";
 import  '../styles/modal.css';
 import {useAuth} from "../context/AuthContext";
@@ -11,59 +11,87 @@ const Parser = () => {
     const [parseResults, setParseResults] = useState([]);
     const [templates, setTemplates] = useState([""]);
     const [modal, setModal] = useState(false);
-    const [links, setLinks] = useState([""]);
+    const [links, setLinks] = useState("");
+    const [badLinks, setBadLinks] = useState([]);
 
-
-    const parse = async () => {
+    const parse = async (badLinks = null) => {
+        if (links === "")
+            return;
         try {
             setParseResults([]);
             setIsParsing(true);
-            console.log(links);
-            const linksArr = links.split('\n').map(l => l.trim()).filter(l => l);
+            const linksArr = (badLinks ?? links).split('\n').map(l => l.trim()).filter(l => l);
+            console.log(linksArr);
             const response = await axios.post(
-                'http://localhost:8080/api/parser/run',
+                '/api/parser/run',
                 linksArr,
                 { headers: {Authorization: `Bearer ${getToken()}`}}
             );
+
+            console.log(linksArr);
             console.log(response.data);
+
             setIsParsing(false);
-            setParseResults(response.data)
+            setParseResults(response.data.filter(x => x !== null))
+
+            setBadLinks(response.data
+                .map((res, i) => res === null ? linksArr[i] : null)
+                .filter(x => x !== null));
+
+            console.log(badLinks);
+
         } catch (e) {
             console.error(e);
         }
     }
 
-
+    const putBadLinks = () => {
+        setLinks(badLinks.join('\n'));
+        setParseResults([]);
+        setBadLinks([]);
+        parse(badLinks.join('\n'));
+    }
 
     const showParseResults = () => {
         return (
-            <table className="table">
+                <table className="table">
 
-                <thead>
-                    <tr>
-                        <th>№</th>
-                        <th>Источник</th>
-                        <th>Ссылка</th>
-                        <th>Рейтинг</th>
-                        <th>Количество отзывов</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {parseResults.map((d, i) => (d &&
+                    <thead>
                         <tr>
-                            <td>{i + 1}</td>
-                            <td>{d.source}</td>
-                            <td>{d.url}</td>
-                            <td>{d.rating}</td>
-                            <td>{d.reviewsCount}</td>
+                            <th>№</th>
+                            <th>Источник</th>
+                            <th>Ссылка</th>
+                            <th>Рейтинг</th>
+                            <th>Количество отзывов</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>)
+                    </thead>
+
+                    <tbody>
+                        {parseResults.map((d, i) => (d &&
+                            <tr>
+                                <td>{i + 1}</td>
+                                <td>{d.source}</td>
+                                <td>{d.url}</td>
+                                <td>{d.rating}</td>
+                                <td>{d.reviewsCount}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+        )
     }
 
-
+    const showBadResults = () => {
+        return ( badLinks.length > 0 &&
+            <div>Произошла ошибка в ссылке(-ах):
+                {badLinks.map((b, i) => (
+                    <li>
+                        {b}
+                    </li>))}
+                <button onClick={putBadLinks}>Попробовать ещё раз</button>
+            </div>
+        )
+    }
 
     const setDate = (date) => {
         return date ? new Date(date).toLocaleString('ru-RU', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—'
@@ -72,59 +100,57 @@ const Parser = () => {
     const handleTemplateChange = (e) => {
         if (e === "create")
             setModal(true);
+        if (e === "")
+            return;
         else {
-            console.log(e);
             const links = e.split(',');
             setLinks(links.join('\n'));
-            console.log(links);
         }
     }
 
     const createTemplate = async (e) => {
-
         setModal(false);
         const links = e.target.tmpLinks.value.split('\n').map(l => l.trim()).filter(l => l);
         const name = e.target.name.value;
         setMessage(`Шаблон ${e.target.name.value} с ${links.length} ссылок создан`);
         try {
             const response = await axios.post(
-                'http://localhost:8080/api/template/save',
+                '/api/template/save',
                 {
                     name: name,
                     links: links
                 },{ headers: {Authorization: `Bearer ${getToken()}`}}
             );
-            console.log(response);
+            setTemplates(prev => [...prev, response.data]);
         }
         catch (e) {
             console.error('Ошибка при создании шаблона', e);
         }
     }
 
-    useEffect(() => {
-
-        console.log("ВЫзов")
-        const getTemplates = async () => {
-            try {
-                const response = await axios.get(
-                    'http://localhost:8080/api/template/get',
-                    { headers: {Authorization: `Bearer ${getToken()}`}});
-                setTemplates(response.data);
-            }
-            catch (e) {
-                console.error('Ошибка при загрузке шаблонов', e)
-                return [];
-            }
+    const getTemplates = async () => {
+        try {
+            const response = await axios.get(
+                '/api/template/get',
+                { headers: {Authorization: `Bearer ${getToken()}`}});
+            setTemplates(response.data);
         }
+        catch (e) {
+            console.error('Ошибка при загрузке шаблонов', e)
+            return [];
+        }
+    }
+
+    useEffect(() => {
         getTemplates();
-        },[!modal])
+        },[])
 
     return (
         <div>
             {message}
             <form onSubmit={(e) => {
                 e.preventDefault();
-                parse(e);
+                parse();
             }}>
                 <div>Введите список ссылок</div>
                 <textarea
@@ -132,8 +158,9 @@ const Parser = () => {
                 onChange={e => setLinks(e.target.value)}
                 cols={50}
                 value={links}
+                disabled={isParsing}
                 placeholder="Список ссылок"/>
-                <button type="submit">parse</button>
+                <button type="submit" disabled={isParsing}>parse</button>
                 <select
                     onChange={e => handleTemplateChange(e.target.value)}>
                     <option value="">Выберите шаблон</option>
@@ -144,12 +171,12 @@ const Parser = () => {
 
                 </select>
 
-
             </form>
             {isParsing && <div>
                 Пожалуйста подождите...
             </div>}
             {parseResults.length > 0 && showParseResults()}
+            {badLinks.length > 0 && showBadResults()}
             {modal && (
                 <div className="modal-overlay" onClick={() => setModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -179,11 +206,6 @@ const Parser = () => {
                 </div>
             )}
 
-
-
-            <div>
-
-            </div>
         </div>
     )
 

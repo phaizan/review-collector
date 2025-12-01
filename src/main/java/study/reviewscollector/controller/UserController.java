@@ -31,7 +31,7 @@ public class UserController {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(user.getName());
+        return ResponseEntity.ok(user.getLogin());
     }
 
     @PostMapping("/login")

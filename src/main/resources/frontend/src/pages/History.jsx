@@ -8,21 +8,22 @@ const History = () => {
     const [historyResults, setHistoryResults] = useState([]);
     const { getToken } = useAuth();
 
-    //const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
     const getHistory = async () => {
         try {
             setIsLoading(true);
             const response = await axios.get(
-                'http://localhost:8080/api/history/getAll',
+                '/api/history/getAll',
                 { headers: {Authorization: `Bearer ${getToken()}`}}
             );
-            console.log(response.data);
             setIsLoading(false);
             setHistoryResults(response.data);
         } catch (e) {
             console.error(e);
         }
+    }
+
+    const setDate = (date) => {
+        return date ? new Date(date).toLocaleString('ru-RU', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—'
     }
 
     const showHistoryResults = () => {
@@ -33,9 +34,10 @@ const History = () => {
                 <tr>
                     <th>№</th>
                     <th>Источник</th>
-                    <th>Ссылка</th>
                     <th>Рейтинг</th>
                     <th>Количество отзывов</th>
+                    <th>Дата</th>
+                    <th>Ссылка</th>
                 </tr>
                 </thead>
 
@@ -44,9 +46,10 @@ const History = () => {
                     <tr>
                         <td>{i + 1}</td>
                         <td>{d.source}</td>
-                        <td>{d.url}</td>
                         <td>{d.rating}</td>
                         <td>{d.reviewsCount}</td>
+                        <td>{setDate(d.parsedAt)}</td>
+                        <td>{d.url}</td>
                     </tr>
                 ))}
                 </tbody>

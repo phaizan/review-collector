@@ -23,11 +23,6 @@ public class TemplateController {
 
     @PostMapping("save")
     public ResponseEntity<?> saveTemplate(@RequestBody NewTemplateDTO templateDTO, @RequestHeader("Authorization") String token) {
-
-        service.save(templateDTO, token);
-
-        return ResponseEntity.ok().build();
-
-
+        return ResponseEntity.ok(service.save(templateDTO, token));
     }
 }

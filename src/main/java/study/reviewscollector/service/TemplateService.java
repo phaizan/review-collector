@@ -19,7 +19,7 @@ public class TemplateService {
     private final TemplateRepository templateRepository;
     private final JwtUtil jwtUtil;
 
-    public void save(NewTemplateDTO templateDTO, String token) {
+    public Template save (NewTemplateDTO templateDTO, String token) {
 
         String login = jwtUtil.extractLogin(token);
 
@@ -29,14 +29,13 @@ public class TemplateService {
                 .userLogin(login)
                 .build();
 
-
         templateRepository.save(template);
+
+        return template;
     }
 
     public List<Template> getAllByUserId(String token) {
         String login = jwtUtil.extractLogin(token);
         return templateRepository.getTemplatesByUserLogin(login);
-
-
     }
 }
