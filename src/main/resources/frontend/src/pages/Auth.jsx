@@ -35,6 +35,7 @@ const Auth = () => {
             return;
         }
 
+        console.log(loginRequest);
         try {
             const response = await axios.post(
                 '/api/user/login',

@@ -125,6 +125,16 @@ input.input {
     text-align: center;
 }
 
+.table td.url,
+.table th.url {
+    max-width: 700px;
+    word-break: break-word;
+    white-space: nowrap;        /* не переносить строку */
+    overflow: hidden;           /* скрывать всё, что не влезло */
+    text-overflow: ellipsis;    /* добавить "..." */
+}
+
+
 td.request-row {
     border: 30px solid #000000;
 
@@ -163,7 +173,7 @@ input, select {
 }
 
 a {
-    text-decoration: none; /* чтобы убрать подчеркивание по умолчанию */
+    color: black;
     transition: color 0.2s ease, text-decoration-color 0.3s ease;
 }
 

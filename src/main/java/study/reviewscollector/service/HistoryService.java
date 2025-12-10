@@ -14,10 +14,10 @@ import java.util.List;
 public class HistoryService {
 
     private final ParsedDataRepository repository;
-    private final JwtUtil jwtUtil;
+    private final JwtUtil util;
 
     public List<ParsedData> getHistory(String token) {
-        String userLogin = jwtUtil.extractLogin(token);
+        String userLogin = util.extractLogin(token);
         return repository.getParsedDataByUserLogin(userLogin);
     }
 

@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import study.reviewscollector.dto.LoginRequestDTO;
 import study.reviewscollector.dto.AuthResponse;
 import study.reviewscollector.entity.User;
-import study.reviewscollector.repository.UserRepository;
-import study.reviewscollector.util.JwtUtil;
+import study.reviewscollector.service.UserService;
 
 
 @RestController
@@ -19,37 +18,28 @@ import study.reviewscollector.util.JwtUtil;
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
+    private final UserService service;
 
     @PostMapping("/registration")
     public ResponseEntity<?> registr (@RequestBody User user) {
 
-        if(userRepository.getUserByLogin(user.getLogin()) != null) {
+        String login = service.registr(user);
+
+        if (login == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Такой логин уже используется");
-        }
 
-        userRepository.save(user);
-
-        return ResponseEntity.ok(user.getLogin());
+        return ResponseEntity.ok(login);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login (@RequestBody LoginRequestDTO loginRequestDTO) {
 
-        User user = userRepository.getUserByLogin(loginRequestDTO.getLogin());
+        AuthResponse response = service.login(loginRequestDTO);
 
-        if (user == null || !user.getPassword().equals(loginRequestDTO.getPassword())) {
+        if (response == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Введен неправильный логин и пароль");
-        }
 
-        String token = jwtUtil.generateToken(user);
-
-        return ResponseEntity.ok(AuthResponse.builder()
-                .token(token)
-                .login(user.getLogin())
-                .name(user.getName())
-                .build());
+        return ResponseEntity.ok(response);
     }
 
 }

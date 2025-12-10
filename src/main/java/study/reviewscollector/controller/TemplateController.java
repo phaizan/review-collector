@@ -3,7 +3,7 @@ package study.reviewscollector.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import study.reviewscollector.dto.NewTemplateDTO;
+import study.reviewscollector.entity.Template;
 import study.reviewscollector.service.TemplateService;
 
 
@@ -22,7 +22,7 @@ public class TemplateController {
     }
 
     @PostMapping("save")
-    public ResponseEntity<?> saveTemplate(@RequestBody NewTemplateDTO templateDTO, @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(service.save(templateDTO, token));
+    public ResponseEntity<?> saveTemplate(@RequestBody Template template, @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(service.save(template, token));
     }
 }

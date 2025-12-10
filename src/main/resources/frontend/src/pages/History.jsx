@@ -49,7 +49,11 @@ const History = () => {
                         <td>{d.rating}</td>
                         <td>{d.reviewsCount}</td>
                         <td>{setDate(d.parsedAt)}</td>
-                        <td>{d.url}</td>
+                        <td className="url">
+                            <a href={d.url}>
+                                {d.url}
+                            </a>
+                        </td>
                     </tr>
                 ))}
                 </tbody>
@@ -63,9 +67,11 @@ const History = () => {
     return (
         <div>
             {isLoading && <div>Загрузка...</div>}
-            {historyResults.length > 0 && showHistoryResults()}
-            {historyResults.length === 0 &&
-                <div>Пока не было ни одного запроса</div>}
+            {!isLoading &&
+                <div>
+                    {historyResults.length > 0 && showHistoryResults()}
+                    {historyResults.length === 0 && <div>Пока не было ни одного запроса</div>}
+                </div>}
         </div>
     )
 

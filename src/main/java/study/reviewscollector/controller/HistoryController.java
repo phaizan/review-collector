@@ -16,10 +16,7 @@ public class HistoryController {
 
     @GetMapping("getAll")
     public ResponseEntity<?> getAll(@RequestHeader("Authorization") String token) {
-
         return ResponseEntity.ok(service.getHistory(token));
-
-
     }
 
 }

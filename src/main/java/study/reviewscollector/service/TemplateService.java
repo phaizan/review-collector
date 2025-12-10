@@ -2,40 +2,33 @@ package study.reviewscollector.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import study.reviewscollector.dto.NewTemplateDTO;
 import study.reviewscollector.entity.Template;
 import study.reviewscollector.repository.TemplateRepository;
-import study.reviewscollector.repository.UserRepository;
 import study.reviewscollector.util.JwtUtil;
 
 import java.util.List;
 
-//TODO Spring Security?
 
 @Service
 @RequiredArgsConstructor
 public class TemplateService {
 
-    private final TemplateRepository templateRepository;
-    private final JwtUtil jwtUtil;
+    private final TemplateRepository repository;
+    private final JwtUtil util;
 
-    public Template save (NewTemplateDTO templateDTO, String token) {
+    public Template save (Template template, String token) {
 
-        String login = jwtUtil.extractLogin(token);
+        String login = util.extractLogin(token);
 
-        Template template = Template.builder()
-                .name(templateDTO.getName())
-                .links(templateDTO.getLinks())
-                .userLogin(login)
-                .build();
+        template.setUserLogin(login);
 
-        templateRepository.save(template);
+        repository.save(template);
 
         return template;
     }
 
     public List<Template> getAllByUserId(String token) {
-        String login = jwtUtil.extractLogin(token);
-        return templateRepository.getTemplatesByUserLogin(login);
+        String login = util.extractLogin(token);
+        return repository.getTemplatesByUserLogin(login);
     }
 }

@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -24,6 +23,6 @@ public class Template {
     private Integer id;
     private String userLogin;
     private String name;
-    private Set<String> links = new HashSet<>();
+    private Set<String> links;
 
 }
