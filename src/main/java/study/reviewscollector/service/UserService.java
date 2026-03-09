@@ -1,10 +1,8 @@
 package study.reviewscollector.service;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import study.reviewscollector.dto.AuthResponse;
-import study.reviewscollector.dto.LoginRequestDTO;
+import study.reviewscollector.dto.LoginDTO;
 import study.reviewscollector.entity.User;
 import study.reviewscollector.repository.UserRepository;
 import study.reviewscollector.util.JwtUtil;
@@ -13,40 +11,31 @@ import study.reviewscollector.util.JwtUtil;
 @RequiredArgsConstructor
 public class UserService {
 
-    public static final String USER_DATA_SESSION_KEY = "UserData";
-
     private final UserRepository repository;
     private final JwtUtil util;
 
     public String registr (User user) {
 
+        //TODO поменять user на dto
         if(repository.getUserByLogin(user.getLogin()) != null) {
             return null;
         }
+
+        //TODO шифрование пароля
+
         repository.save(user);
 
         return user.getLogin();
     }
 
-    public void getUserBySession (HttpSession session) {
-        AuthResponse user = (AuthResponse) session.getAttribute(USER_DATA_SESSION_KEY);
-        System.out.println("Пользователь:" + user);
-    }
+    public String login (LoginDTO loginDTO) {
 
-    public AuthResponse login (LoginRequestDTO loginRequestDTO) {
+        User user = repository.getUserByLogin(loginDTO.getLogin());
 
-        User user = repository.getUserByLogin(loginRequestDTO.getLogin());
-
-        if (user == null || !user.getPassword().equals(loginRequestDTO.getPassword())) {
+        if (user == null || !user.getPassword().equals(loginDTO.getPassword())) {
             return null;
         }
 
-        String token = util.generateToken(user);
-
-        return AuthResponse.builder()
-                .token(token)
-                .login(user.getLogin())
-                .name(user.getName())
-                .build();
+        return util.generateToken(user);
     }
 }

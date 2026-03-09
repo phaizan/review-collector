@@ -13,18 +13,22 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
+    //TODO добавить проверку на expire и подделку (try?)
+
     private final Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode("bXktdmVyeS1zZWNyZXQta2V5LXRoYXQtaXMtbG9uZy1lbm91Z2gh"));
 
-    private final long EXPIRATIONTIME = 1000 * 60 * 60;
+    private final long EXPIRATION_TIME = 1000 * 60 * 60;
 
     public String generateToken(User user) {
+
         return Jwts.builder()
                 .setSubject(user.getLogin())
                 .claim("name", user.getName())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
     }
 
     public String extractLogin(String token) {

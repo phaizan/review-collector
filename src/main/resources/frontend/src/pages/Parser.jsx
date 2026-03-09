@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
-import axios from "axios";
 import  '../styles/modal.css';
-import {useAuth} from "../context/AuthContext";
+import {useAuth} from "../context/AuthProvider";
+import api from "../api/axios";
 
 
 const Parser = () => {
@@ -14,11 +14,9 @@ const Parser = () => {
     const [links, setLinks] = useState("");
     const [badLinks, setBadLinks] = useState([]);
 
-    //const parse = async (badLinks = null) => {
     const parse = async () => {
         if (links === "")
             return;
-
 
         setParseResults([]);
         setBadLinks([]);
@@ -52,11 +50,9 @@ const Parser = () => {
         try {
             setIsParsing(true);
             console.log(linksArr);
-            const response = await axios.post(
-                '/api/parser/run',
-                linksArr,
-                { headers: {Authorization: `Bearer ${getToken()}`}}
-            );
+            const response = await api.post(
+                '/parser/run',
+                linksArr);
 
             console.log(linksArr);
             console.log(response.data);
@@ -81,8 +77,6 @@ const Parser = () => {
         setLinks(badLinks.map(b => b.parsedData.url).join('\n'));
         setParseResults([]);
         setBadLinks([]);
-        //parse(badLinks.join('\n'));
-        parse();
     }
 
     const showParseResults = () => {
@@ -92,6 +86,7 @@ const Parser = () => {
                     <thead>
                         <tr>
                             <th>№</th>
+                            <th>Название</th>
                             <th>Источник</th>
                             <th>Рейтинг</th>
                             <th>Количество отзывов</th>
@@ -103,6 +98,7 @@ const Parser = () => {
                         {parseResults.map((d, i) => (d &&
                             <tr>
                                 <td>{i + 1}</td>
+                                <td>{d.parsedData.name}</td>
                                 <td>{d.parsedData.source}</td>
                                 <td>{d.parsedData.rating}</td>
                                 <td>{d.parsedData.reviewsCount}</td>
@@ -119,18 +115,17 @@ const Parser = () => {
         console.log(badLinks);
 
         return (badLinks.length > 0 &&
-            <div>Произошла ошибка в ссылке(-ах):
+            <div>Произошла ошибка в ссылк
+                {badLinks.length === 1  && <>e</>}
+                {badLinks.length > 1  && <>ах</>}
+                :
                 {badLinks.map((b, i) => (
                     <li>
-                        {b.error}: <a>{b.parsedData.url}</a>
+                        {b.error}: <a href={b.parsedData.url}>{b.parsedData.url}</a>
                     </li>))}
                 <button className="btn btn-danger" onClick={putBadLinks}>Попробовать ещё раз</button>
             </div>
         )
-    }
-
-    const setDate = (date) => {
-        return date ? new Date(date).toLocaleString('ru-RU', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—'
     }
 
     const handleTemplateChange = (e) => {
@@ -144,20 +139,26 @@ const Parser = () => {
         }
     }
 
+    //TODO вынести в отдельную страницу все что связано с сетами.
+    //TODO переименовать template в сет
+
+
+
     const createTemplate = async (e) => {
         setModal(false);
         const links = e.target.tmpLinks.value.split('\n').map(l => l.trim()).filter(l => l);
         const name = e.target.name.value;
-        setMessage(`Шаблон ${e.target.name.value} с ${links.length} ссылок создан`);
         try {
-            const response = await axios.post(
-                '/api/template/save',
+            //TODO добавить проверку формата ссылок (вынести в отдельную функцию из parse)
+            const response = await api.post(
+                '/template/save',
                 {
                     name: name,
                     links: links
                 },{ headers: {Authorization: `Bearer ${getToken()}`}}
             );
             setTemplates(prev => [...prev, response.data]);
+            setMessage(`Шаблон ${e.target.name.value} с ${links.length} ссылок создан`);
         }
         catch (e) {
             console.error('Ошибка при создании шаблона', e);
@@ -166,9 +167,7 @@ const Parser = () => {
 
     const getTemplates = async () => {
         try {
-            const response = await axios.get(
-                '/api/template/get',
-                { headers: {Authorization: `Bearer ${getToken()}`}});
+            const response = await api.get('/template/get');
             setTemplates(response.data);
         }
         catch (e) {
@@ -200,7 +199,7 @@ const Parser = () => {
                     <button className="btn" type="submit" disabled={isParsing}>Начать парсинг</button>
                     <select
                         onChange={e => handleTemplateChange(e.target.value)}>
-                        <option value="">Выберите шаблон</option>
+                        <option value="">Выберите сет</option>
                         {templates.map(t => (
                             <option key={t.id} value={t.links}>{t.name}</option>
                         ))}

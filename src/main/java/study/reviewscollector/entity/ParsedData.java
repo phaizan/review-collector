@@ -27,6 +27,8 @@ public class ParsedData {
 
     private String source;
 
+    private String name;
+
     private Double rating;
 
     private Integer reviewsCount;

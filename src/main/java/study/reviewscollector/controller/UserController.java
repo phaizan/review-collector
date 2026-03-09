@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import study.reviewscollector.dto.LoginRequestDTO;
-import study.reviewscollector.dto.AuthResponse;
+import study.reviewscollector.dto.LoginDTO;
 import study.reviewscollector.entity.User;
 import study.reviewscollector.service.UserService;
 
@@ -22,7 +21,7 @@ public class UserController {
 
     @PostMapping("/registration")
     public ResponseEntity<?> registr (@RequestBody User user) {
-
+        //TODO поменять тут вместо user RegistrDTO
         String login = service.registr(user);
 
         if (login == null)
@@ -32,14 +31,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login (@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<?> login (@RequestBody LoginDTO dto) {
 
-        AuthResponse response = service.login(loginRequestDTO);
+        String token = service.login(dto);
 
-        if (response == null)
+        if (token == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Введен неправильный логин и пароль");
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(token);
     }
 
 }

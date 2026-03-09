@@ -1,16 +1,16 @@
-import React, { useEffect, useState} from 'react';
+import React, { useState} from 'react';
 import '../styles/Login.css'
 import '../styles/Styles.css'
-import axios from "axios";
+import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from  '../context/AuthProvider'
 
 const Auth = () => {
 
     const navigate = useNavigate();
-    const { user, saveUser } = useAuth();
-    const [message, setMessage] = useState(String);
-    const [newUser, setNewUser] = useState({ name: '', login: '', password: ''});
+    const { login } = useAuth();
+    const [message, setMessage] = useState(null);
+    const [newUser, setNewUser] = useState({ name: '', llogin: '', password: ''});
     const [showLoginFrom, setShowLoginFrom] = useState(true);
     const [loginRequest, setLoginRequest] = useState({login: '', password: ''});
     const loginFields= [
@@ -21,33 +21,30 @@ const Auth = () => {
         {type: 'text', name: 'name', placeholder: "Имя"},
         {type: 'text', name: 'login', placeholder: "Логин"},
         {type: 'password', name: 'password', placeholder: "Пароль"},
-
+        {type: 'password', name: 'password', placeholder: "Повторите пароль"}, //TODO проверить функциональность этого поля
     ]
 
-    useEffect(() => {
-        if (user) {
-            navigate("/main");
-        }
-    }, [user, navigate]);
+    const handleLogin = async (e) => {
 
-    const login = async () => {
+        e.preventDefault();
+
         if (!loginRequest.login.trim()) {
             return;
         }
-
         console.log(loginRequest);
         try {
-            const response = await axios.post(
-                '/api/user/login',
-                //'http://localhost:8080/api/user/login',
+
+            const response = await api.post(
+                '/user/login',
                 loginRequest,
             );
 
-            const loggedUser = response.data;
-           /* const {token} = response.data;
-            localStorage.setItem('token', token)*/
-            saveUser(loggedUser);
-            navigate('/main');
+            const token = response.data;
+
+            login(token);
+
+            navigate('/main/parser');
+
         }
         catch (e) {
             console.error(e);
@@ -57,7 +54,8 @@ const Auth = () => {
 
     const registr = async () => {
         try {
-            const response = await axios.post('/api/user/registration', newUser);
+            //TODO добавить проверку паролей
+            const response = await api.post('/user/registration', newUser);
             console.log(response);
             setMessage(`Пользователь ${response.data} зарегистрирован`);
             setShowLoginFrom(true);
@@ -68,11 +66,15 @@ const Auth = () => {
     }
 
 
-    const handleLoginChange = (field, value) => {
+    /*const handleLoginChange = (field, value) => {
         setLoginRequest(prev => ({...prev, [field]: value}))
+    }*/
+
+    const handleLoginChange = (field, value) => {
+        setLoginRequest({...loginRequest, [field]: value});
     }
 
-    const handleUserChange = (field, value) => {
+    const handleNewUserChange = (field, value) => {
         setNewUser(prev => ({...prev, [field]: value}))
     }
 
@@ -88,10 +90,7 @@ const Auth = () => {
                                     <span>{message}</span>
                                 </div>
                             )}
-                            <form onSubmit={(e) => {
-                                e.preventDefault();
-                                login();
-                            }}>
+                            <form onSubmit={handleLogin}>
                                 {loginFields.map(f => {
                                     return (
                                         <input
@@ -127,7 +126,7 @@ const Auth = () => {
                                             type={f.type}
                                             required
                                             value={newUser[f.name]}
-                                            onChange={e => handleUserChange(f.name, e.target.value)}
+                                            onChange={e => handleNewUserChange(f.name, e.target.value)}
                                             placeholder={f.placeholder}
                                         />
                                     )})
@@ -250,24 +249,7 @@ const Auth = () => {
             </div>*/}
 
         </div>
-
-
-
-
-
     )
 }
-
-export const getUserData = async () => {
-    try {
-        const response = await axios.get('http://localhost:8080/api/user/data');
-        return response.data;
-    }
-    catch (e) {
-        console.error("Пользователь не авторизован");
-        return null;
-    }
-}
-
 
 export default Auth;

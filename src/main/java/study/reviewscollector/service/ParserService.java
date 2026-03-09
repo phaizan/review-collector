@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 //TODO Возможность планирования периодичности сбора данных (например, ежедневно, еженедельно).
 //TODO Проверку корректности URL-адресов, добавляемых пользователем.
@@ -114,6 +115,15 @@ public class ParserService {
             "yandex", ".business-header-rating-view .business-rating-badge-view__rating-text"
     ));
 
+    private static final HashMap<String, String> NAME_SELECTORS = new HashMap<>(Map.of(
+            "otzovik", ".fn",
+            "irecommend", ".fn",
+            "otzyvru", ".element_name",
+            "flamp", ".header-filial__name",
+            "2gis", "h1._1x89xo5",
+            "yandex", ".business-header-rating-view .business-rating-badge-view__rating-text"
+    ));
+
     @Async
     public CompletableFuture<ParseResult> parse(String url, String userLogin) {
         try {
@@ -154,6 +164,7 @@ public class ParserService {
 
                 Double rating = extractRating(doc, source);
                 Integer reviewsCount = extractReviewsCount(doc, source);
+                String name = extractName(doc, source);
 
                 if (rating == null || reviewsCount == null) {
                     try { Thread.sleep(i * 500L); }
@@ -164,6 +175,7 @@ public class ParserService {
                 ParsedData parsedData = ParsedData.builder()
                         .url(url)
                         .source(source)
+                        .name(name)
                         .rating(rating)
                         .reviewsCount(reviewsCount)
                         .parsedAt(LocalDateTime.now())
@@ -218,9 +230,21 @@ public class ParserService {
 
         String text = doc.select(REVIEWS_COUNT_SELECTORS.get(source)).text();
         if (!text.isEmpty()){
-            if (!source.equals("vk.com"))
-                return Integer.parseInt(text.split(" ")[0].replace(",", "."));
-            return Integer.parseInt(text.split(" ")[2].replace(",", "."));
+            return Integer.parseInt(text.split(" ")[0].replace(",", "."));
+        }
+        return null;
+    }
+
+    private String extractName(Document doc, String source) {
+
+        String text = doc.select(NAME_SELECTORS.get(source)).text();
+        if (!text.isEmpty()){
+            if (!source.equals("otzyvru"))
+                return text;
+            else
+                return Arrays.stream(text.split(" "))
+                        .filter(s -> !s.equals("отзывы"))
+                        .collect(Collectors.joining(" "));
         }
         return null;
     }

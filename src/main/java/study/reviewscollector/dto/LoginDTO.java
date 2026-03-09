@@ -1,14 +1,16 @@
 package study.reviewscollector.dto;
 
-import lombok.Builder;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@Builder
-public class AuthResponse {
+public class LoginDTO {
+    //TODO переименовать в LoginDTO
+
     private String login;
-    private String name;
-    private String token;
+
+    private String password;
+
 }

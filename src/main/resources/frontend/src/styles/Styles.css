@@ -8,22 +8,7 @@ body, html {
     background: #f6f6f6;
 }
 
-.hello {
-    position: fixed;
-    top: 10px;
-    right: 20px;
-    background-color: #ffffff;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: 1px solid #343a40;
-    box-shadow: 0 4px 8px #adb5bd;
-    font-size: 18px;
-    color: black;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 1000;
-}
+
 
 th.name, td.name {
     width: 200px;

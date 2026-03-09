@@ -1,0 +1,63 @@
+/* Общие стили navbar */
+.navbar {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    width: 100%;
+    height: 70px;
+    border-bottom: 1px solid #000000;
+    position: relative;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Логотип / название приложения */
+.navbar .logo {
+    font-size: 48px; /* чуть меньше, чтобы на мобилках помещалось */
+    font-weight: 400;
+    color: #000000;
+}
+
+/* Навигационные ссылки */
+.navbar nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap; /* чтобы на узких экранах ссылки переносились */
+}
+
+.navbar nav a {
+    font-size: 20px;
+    font-weight: 400;
+    color: #000000;
+    text-decoration: none;
+    padding: 4px 8px;
+    transition: all 0.2s;
+}
+
+.navbar nav a.active {
+    font-weight: 700;
+    border-bottom: 2px solid #000000;
+}
+
+/* Блок приветствия и кнопка выхода */
+.navbar .user-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.navbar .user-block button {
+
+    color: #FFFFFF;
+    background: #0D0D0D;
+    border: none;
+    border-radius: 12px;
+    padding: 8px 16px;
+    cursor: pointer;
+}

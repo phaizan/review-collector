@@ -18,7 +18,7 @@ public class TemplateController {
 
     @GetMapping("get")
     public ResponseEntity<?> getTemplates(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(service.getAllByUserId(token));
+        return ResponseEntity.ok(service.getAllByUserLogin(token));
     }
 
     @PostMapping("save")

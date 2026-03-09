@@ -1,19 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import axios from "axios";
-import {useAuth} from "../context/AuthContext";
+import api from "../api/axios";
+import {useAuth} from "../context/AuthProvider";
 
 const History = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [historyResults, setHistoryResults] = useState([]);
-    const { getToken } = useAuth();
 
     const getHistory = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get(
-                '/api/history/getAll',
-                { headers: {Authorization: `Bearer ${getToken()}`}}
+            const response = await api.get(
+                '/history/getAll'
             );
             setIsLoading(false);
             setHistoryResults(response.data);
