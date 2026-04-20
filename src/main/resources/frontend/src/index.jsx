@@ -7,6 +7,8 @@ import { AuthProvider } from "./context/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import History from "./pages/History";
 import Parser from "./pages/Parser";
+import Set from "./pages/Set";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Index = () => {
 
@@ -18,6 +20,7 @@ const Index = () => {
                     <Route element={<ProtectedRoute/>}>
                         <Route path="/main" element={<Main/>}>
                             <Route index element={<Parser/>}/>
+                            <Route path="set" element={<Set/>}/>
                             <Route path="parser" element={<Parser/>}/>
                             <Route path="history" element={<History/>}/>
                         </Route>
@@ -31,9 +34,7 @@ const Index = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <React.StrictMode>
-        <AuthProvider>
-            <Index />
-        </AuthProvider>
-    </React.StrictMode>
+    <AuthProvider>
+        <Index />
+    </AuthProvider>
 );

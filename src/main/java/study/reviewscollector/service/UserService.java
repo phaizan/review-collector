@@ -1,8 +1,10 @@
 package study.reviewscollector.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import study.reviewscollector.dto.LoginDTO;
+import study.reviewscollector.dto.RegisterDTO;
 import study.reviewscollector.entity.User;
 import study.reviewscollector.repository.UserRepository;
 import study.reviewscollector.util.JwtUtil;
@@ -12,27 +14,31 @@ import study.reviewscollector.util.JwtUtil;
 public class UserService {
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtUtil util;
 
-    public String registr (User user) {
+    public String register (RegisterDTO dto) {
 
-        //TODO поменять user на dto
-        if(repository.getUserByLogin(user.getLogin()) != null) {
+        if(repository.getUserByLogin(dto.getLogin()) != null) {
             return null;
         }
 
-        //TODO шифрование пароля
+        User user = User.builder()
+                .login(dto.getLogin())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .name(dto.getName())
+                .build();
 
         repository.save(user);
 
-        return user.getLogin();
+        return dto.getLogin();
     }
 
     public String login (LoginDTO loginDTO) {
 
         User user = repository.getUserByLogin(loginDTO.getLogin());
 
-        if (user == null || !user.getPassword().equals(loginDTO.getPassword())) {
+        if (user == null || !passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
             return null;
         }
 

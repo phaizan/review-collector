@@ -1,7 +1,9 @@
 package study.reviewscollector.controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import study.reviewscollector.entity.Template;
 import study.reviewscollector.service.TemplateService;
@@ -15,14 +17,26 @@ public class TemplateController {
 
     private final TemplateService service;
 
-
     @GetMapping("get")
-    public ResponseEntity<?> getTemplates(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(service.getAllByUserLogin(token));
+    public ResponseEntity<?> getTemplates(Authentication authentication) {
+        return ResponseEntity.ok(service.getAllByUserLogin(authentication));
     }
 
-    @PostMapping("save")
-    public ResponseEntity<?> saveTemplate(@RequestBody Template template, @RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(service.save(template, token));
+    @PostMapping("create")
+    public ResponseEntity<?> createTemplate(@RequestBody Template template, Authentication authentication) {
+        return ResponseEntity.ok(service.createTemplate(template, authentication));
+    }
+
+    @Transactional
+    @PostMapping("update")
+    public ResponseEntity<?> updateTemplate(@RequestBody Template template) {
+        return ResponseEntity.ok(service.updateTemplate(template));
+    }
+
+    @Transactional
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> deleteTemplate(@PathVariable int id) {
+        service.deleteTemplate(id);
+        return ResponseEntity.ok().build();
     }
 }

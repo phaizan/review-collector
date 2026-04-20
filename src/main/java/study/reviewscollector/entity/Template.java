@@ -21,6 +21,7 @@ public class Template {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    //TODO сделать связь?
     private String userLogin;
     private String name;
     private Set<String> links;

@@ -1,10 +1,11 @@
 package study.reviewscollector.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import study.reviewscollector.entity.Template;
+import study.reviewscollector.entity.User;
 import study.reviewscollector.repository.TemplateRepository;
-import study.reviewscollector.util.JwtUtil;
 
 import java.util.List;
 
@@ -14,24 +15,33 @@ import java.util.List;
 public class TemplateService {
 
     private final TemplateRepository repository;
-    private final JwtUtil util;
 
-    //TODO переименовать в createTemplate и в контроллере
-    public Template save (Template template, String token) {
+    public Template createTemplate (Template template, Authentication authentication) {
 
-        String login = util.extractLogin(token);
-
-        //TODO добавить проверку на источник
-
+        User user = (User) authentication.getPrincipal();
+        String login = user.getLogin();
         template.setUserLogin(login);
-
         repository.save(template);
-
         return template;
+
     }
 
-    public List<Template> getAllByUserLogin(String token) {
-        String login = util.extractLogin(token);
-        return repository.getTemplatesByUserLogin(login);
+    public Template updateTemplate (Template tmp) {
+
+        repository.save(tmp);
+        return tmp;
+
+    }
+
+    public List<Template> getAllByUserLogin(Authentication authentication) {
+
+        User user = (User) authentication.getPrincipal();
+        String login = user.getLogin();
+        return repository.getTemplatesByUserLoginOrderByIdAsc(login);
+
+    }
+
+    public void deleteTemplate(int id) {
+        repository.deleteById(id);
     }
 }

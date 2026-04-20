@@ -1,12 +1,17 @@
 package study.reviewscollector.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Data
-@Accessors(chain = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "users")
 public class User {
 
@@ -19,5 +24,8 @@ public class User {
     private String password;
 
     private String name;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MonitoredCard> cards = new ArrayList<>();
 
 }

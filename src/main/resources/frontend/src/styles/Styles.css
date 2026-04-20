@@ -4,7 +4,7 @@ body, html {
     min-height: 100vh;
     box-sizing: border-box;
     margin: 20px 20px 20px 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', sans-serif;
     background: #f6f6f6;
 }
 
@@ -41,7 +41,11 @@ svg.danger:hover {
 }
 
 h2 {
-    margin-bottom: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 37px;
+    font-weight: normal;
+    margin-top: 50px;
+    margin-bottom: 30px;
 }
 
 .form-row input.input {

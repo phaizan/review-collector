@@ -2,13 +2,13 @@ package study.reviewscollector.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import study.reviewscollector.entity.ParseResult;
+import study.reviewscollector.dto.ParseResultDTO;
+import study.reviewscollector.entity.User;
 import study.reviewscollector.service.ParserService;
-import study.reviewscollector.util.JwtUtil;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("api/parser")
@@ -17,23 +17,14 @@ import java.util.concurrent.CompletableFuture;
 public class ParserController {
 
     private final ParserService service;
-    private final JwtUtil util;
 
     @PostMapping("run")
-    public ResponseEntity<?> runParser(
-            @RequestBody List<String> urls,
-            @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> runParser(@RequestBody List<String> urls, Authentication authentication) {
 
-        String userLogin = util.extractLogin(token);
+        User user = (User) authentication.getPrincipal();
 
-        List<CompletableFuture<ParseResult>> futures = urls.stream()
-                .map(url -> service.parse(url, userLogin))
-                .toList();
+        List<ParseResultDTO> results = service.parseAll(urls, user);
 
-        // Дожидаемся завершения всех задач
-        List<ParseResult> results = futures.stream()
-                .map(CompletableFuture::join)
-                .toList();
         return ResponseEntity.ok(results);
 
     }

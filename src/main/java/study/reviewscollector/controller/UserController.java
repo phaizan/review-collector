@@ -1,28 +1,25 @@
 package study.reviewscollector.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.reviewscollector.dto.LoginDTO;
-import study.reviewscollector.entity.User;
+import study.reviewscollector.dto.RegisterDTO;
 import study.reviewscollector.service.UserService;
 
 
 @RestController
-@RequestMapping("/api/user")
 @RequiredArgsConstructor
-@Slf4j
+@RequestMapping("/api/user")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
     private final UserService service;
 
     @PostMapping("/registration")
-    public ResponseEntity<?> registr (@RequestBody User user) {
-        //TODO поменять тут вместо user RegistrDTO
-        String login = service.registr(user);
+    public ResponseEntity<?> registr (@RequestBody RegisterDTO dto) {
+        String login = service.register(dto);
 
         if (login == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Такой логин уже используется");

@@ -14,6 +14,10 @@ const Main = () => {
                 <div className="logo">Revy</div>
 
                 <nav>
+                    <NavLink to="set" style={({isActive}) => ({fontWeight: isActive ? 'bold' : 'normal'})}>
+                        Сет
+                    </NavLink>
+
                     <NavLink to="parser" style={({isActive}) => ({fontWeight: isActive ? 'bold' : 'normal'})}>
                         Парсер
                     </NavLink>

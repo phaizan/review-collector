@@ -1,63 +1,202 @@
-/* Общие стили navbar */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400&family=Inter:wght@400;500&display=swap');
+
+/* Общий контейнер navbar */
 .navbar {
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
     width: 100%;
-    height: 70px;
+    height: 54px;
+    padding: 0;
+    margin-top: 26px;
     border-bottom: 1px solid #000000;
-    position: relative;
-    font-family: 'Inter', sans-serif;
 }
 
-/* Логотип / название приложения */
-.navbar .logo {
-    font-size: 48px; /* чуть меньше, чтобы на мобилках помещалось */
-    font-weight: 400;
-    color: #000000;
-}
-
-/* Навигационные ссылки */
-.navbar nav {
+/* Левый блок с логотипом */
+.navbar .logo-container {
+    box-sizing: border-box;
     display: flex;
-    gap: 20px;
     align-items: center;
-    justify-content: center;
-    flex-wrap: wrap; /* чтобы на узких экранах ссылки переносились */
+    padding: 12px 20px 10px 0;
+    height: 54px;
+    border-bottom: 1px solid #000000;
+    flex: 0 0 auto;
 }
 
-.navbar nav a {
-    font-size: 20px;
+/* Надпись Revy */
+.navbar .logo {
+    font-family: 'Instrument Sans', sans-serif;
+    font-style: normal;
     font-weight: 400;
+    font-size: 64px;
+    line-height: 110%;
+    letter-spacing: -0.05em;
     color: #000000;
     text-decoration: none;
-    padding: 4px 8px;
-    transition: all 0.2s;
-}
-
-.navbar nav a.active {
-    font-weight: 700;
-    border-bottom: 2px solid #000000;
-}
-
-/* Блок приветствия и кнопка выхода */
-.navbar .user-block {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 18px;
-    font-weight: 500;
 }
 
-.navbar .user-block button {
+/* Центральный блок навигации */
+.navbar nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 34px;
+    height: 54px;
+    flex: 0 0 auto;
+}
 
-    color: #FFFFFF;
-    background: #0D0D0D;
+/* Ссылки навигации */
+.navbar nav a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 4px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.05em;
+    color: #000000;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+/* Активная ссылка */
+.navbar nav a.active {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+}
+
+/* Правый блок */
+.navbar .user-block {
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    height: 54px;
+    padding: 5px 15px;
+    flex: 0 0 auto;
+}
+
+/* Текст приветствия */
+.navbar .user-block span {
+    display: flex;
+    align-items: center;
+    padding: 0 0 4px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+}
+
+/* Кнопка выхода */
+.navbar .user-block button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 16px;
+    min-width: 95px;
+    height: 44px;
     border: none;
     border-radius: 12px;
-    padding: 8px 16px;
+    background: #0d0d0d;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 145%;
+    letter-spacing: -0.005em;
     cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.navbar .user-block button:hover {
+    opacity: 0.92;
+}
+
+.navbar .user-block button:active {
+    transform: translateY(1px);
+}
+
+/* Адаптив */
+@media (max-width: 1200px) {
+    .navbar {
+        padding: 0 16px;
+        gap: 20px;
+    }
+
+    .navbar .logo {
+        font-size: 52px;
+    }
+
+    .navbar nav {
+        gap: 24px;
+    }
+
+    .navbar nav a,
+    .navbar .user-block span,
+    .navbar .user-block button {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 900px) {
+    .navbar {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 12px 16px;
+        row-gap: 12px;
+    }
+
+    .navbar .logo-container,
+    .navbar .user-block {
+        border-bottom: none;
+        height: auto;
+        padding: 0;
+    }
+
+    .navbar nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        height: auto;
+        gap: 18px;
+    }
+
+    .navbar .logo {
+        font-size: 42px;
+    }
+
+    .navbar .user-block {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar .logo {
+        font-size: 34px;
+    }
+
+    .navbar nav a,
+    .navbar .user-block span {
+        font-size: 16px;
+    }
+
+    .navbar .user-block button {
+        font-size: 16px;
+        min-width: 80px;
+        height: 40px;
+        padding: 10px 14px;
+    }
 }
