@@ -26,23 +26,18 @@ public class ReportService {
     private final HistoryService historyService;
 
     public byte[] createReport(HistoryRequestDTO request, Authentication authentication) throws IOException {
-
         List<CardDTO> cards = historyService.getHistory(request, authentication);
-
         List<LocalDate> dateColumns = cards.stream()
                 .flatMap(card -> card.getSnapshots().stream())
                 .map(SnapshotDTO::getParsedAt)
                 .distinct()
                 .sorted()
                 .toList();
-
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-
             generateTable(workbook, cards, dateColumns);
             workbook.write(out);
             return out.toByteArray();
-
         }
     }
 

@@ -42,7 +42,7 @@ svg.danger:hover {
 
 h2 {
     font-family: 'Inter', sans-serif;
-    font-size: 37px;
+    font-size: 30px;
     font-weight: normal;
     margin-top: 50px;
     margin-bottom: 30px;
@@ -163,6 +163,7 @@ input, select {
 
 a {
     color: black;
+    text-decoration: underline;
     transition: color 0.2s ease, text-decoration-color 0.3s ease;
 }
 
