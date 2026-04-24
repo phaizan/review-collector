@@ -3,6 +3,7 @@ import api from "../api/axios";
 import { getTemplates } from "./Set";
 import "./../styles/Parser.css";
 import {validateLinks} from "../util/validateLinks";
+import {getSourceMeta} from "./History";
 
 //TODO Сделать вывод резульатов также как в истории (группировать и сортировать по источнику)
 
@@ -61,12 +62,12 @@ const Parser = () => {
                 '/parser/run',
                 validation.links);
 
-            setIsParsing(false);
             setParseResults(response.data.filter(d => d.errorMessage === null))
             setBadLinks(response.data.filter(d => d.errorMessage !== null))
 
         } catch (e) {
-            setMessage(e.message);
+            setMessage(e?.response?.data || e.message || "Ошибка")
+            //setMessage(e.message);
             console.error(e);
         }
         finally {
@@ -81,9 +82,25 @@ const Parser = () => {
     }
 
     const showParseResults = () => {
+
+        const sortedResults = [...parseResults].sort((a, b) => {
+            const sourceCompare = (a.source || "").localeCompare(b.source || "", "ru", {
+                sensitivity: "base",
+            });
+
+            if (sourceCompare !== 0)
+                return sourceCompare;
+
+            return (a.name || "").localeCompare(b.name || "", "ru", {
+                sensitivity: "base",
+            });
+        });
+
+        const { counts, firstIndexes } = getSourceMeta(sortedResults);
+
         return (
             <div className="parser-results">
-                <table className="table history-table">
+                <table className="table parser-table">
                     <thead>
                         <tr>
                             <th>Площадка</th>
@@ -93,21 +110,30 @@ const Parser = () => {
                         </tr>
                     </thead>
 
-
-
                     <tbody>
-                        {parseResults.map((d, i) => (d &&
-                            <tr>
-                                <td>{d.source}</td>
-                                <td>
-                                    <a href={d.url}>
-                                        {d.name}
-                                    </a>
-                                </td>
-                                <td>{d.reviewsCount}</td>
-                                <td>{d.rating}</td>
-                            </tr>
-                        ))}
+                        {sortedResults.map((d, i) => {
+                            const isFirstInGroup = firstIndexes[d.source] === i;
+                            const isLastInSourceGroup =
+                                i === sortedResults.length - 1 ||
+                                sortedResults[i + 1].source !== d.source;
+                            return (
+                                <tr key={`${d.url}-${i}`} className={isLastInSourceGroup ? 'history-table__source-break' : ''}>
+                                    {isFirstInGroup && (
+                                        <td rowSpan={counts[d.source]} className="history-table__source-cell">
+                                            {d.source}
+                                        </td>
+                                    )}
+                                    <td className="history-table__fixed-end url">
+                                        <a href={d.url}>
+                                            {d.name}
+                                        </a>
+                                    </td>
+                                    <td className="parser-table-reviews-count">{d.reviewsCount}</td>
+                                    <td>{d.rating}</td>
+                                </tr>
+
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

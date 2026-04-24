@@ -7,9 +7,7 @@ import java.util.List;
 
 public interface MonitoredCardRepository extends JpaRepository<MonitoredCard, Integer> {
 
-    MonitoredCard getMonitoredCardByUrl(String url);
-
-    boolean existsByUrl(String url);
-
     List<MonitoredCard> getAllByUser_IdAndUrlInOrderBySourceAscNameAsc(Integer id, List<String> links);
+
+    MonitoredCard getMonitoredCardByUserIdAndUrl(Integer user_id, String url);
 }

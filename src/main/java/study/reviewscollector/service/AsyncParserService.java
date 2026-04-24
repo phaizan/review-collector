@@ -13,7 +13,6 @@ import study.reviewscollector.entity.User;
 import study.reviewscollector.repository.CardSnapshotRepository;
 import study.reviewscollector.repository.MonitoredCardRepository;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -74,7 +73,7 @@ public class AsyncParserService {
             "otzyvru", "span.count",
             "2gis", "._1pfef7u ._jspzdm",
             "flamp", ".filial-rating__reviews",
-            "yandex", ".business-header-rating-view .business-header-rating-view__text"
+            "yandex", ".business-header-rating-view__text"
     ));
 
     private static final HashMap<String, String> RATINGS_SELECTORS = new HashMap<>(Map.of(
@@ -94,8 +93,8 @@ public class AsyncParserService {
             "2gis", new String[]{"h1._1x89xo5", "h1._1rehek"},
             "yandex", new String[]{".card-title-view__title-link", ".orgpage-header-view__header-wrapper .orgpage-header-view__header"}
     );
-    @Transactional
     @Async
+    @Transactional
     public CompletableFuture<ParseResultDTO> parse(String url, User user) {
         try {
 
@@ -115,87 +114,91 @@ public class AsyncParserService {
                         .build());
             }
 
-            for (int i = 0; i < 3; i++)
-            {
-                randomDelay();
+            Integer userId = user.getId();
 
-                String randomAgent = USER_AGENTS.get(ThreadLocalRandom.current().nextInt(USER_AGENTS.size()));
-                String randomReferer = REFFER_FROM.get(ThreadLocalRandom.current().nextInt(REFFER_FROM.size()));
-                Document doc = Jsoup.connect(url)
-                        .userAgent(randomAgent)
-                        .referrer(randomReferer)
-                        .timeout(15000)
-                        .get();
+            for (int i = 0; i < 3; i++) {
+                try {
+                    randomDelay();
 
-                Double rating = extractRating(doc, source);
-                Integer reviewsCount = extractReviewsCount(doc, source);
-                String name = extractName(doc, source);
+                    String randomAgent = USER_AGENTS.get(ThreadLocalRandom.current().nextInt(USER_AGENTS.size()));
+                    String randomReferer = REFFER_FROM.get(ThreadLocalRandom.current().nextInt(REFFER_FROM.size()));
 
-                if (rating == null || reviewsCount == null || name == null) {
-                    try { Thread.sleep(i * 500L); }
-                    catch (InterruptedException ignored) {}
-                    continue;
-                }
+                    Document doc = Jsoup.connect(url)
+                            .userAgent(randomAgent)
+                            .referrer(randomReferer)
+                            .timeout(15000)
+                            .get();
 
-                CardSnapshot snapshot = CardSnapshot.builder()
-                        .rating(rating)
-                        .reviewsCount(reviewsCount)
-                        .parsedAt(LocalDate.now())
-                        .build();
+                    Double rating = extractRating(doc, source);
+                    Integer reviewsCount = extractReviewsCount(doc, source);
+                    String name = extractName(doc, source);
 
-                ParseResultDTO resultDTO = ParseResultDTO.builder()
-                        .url(url)
-                        .name(name)
-                        .source(source)
-                        .rating(rating)
-                        .reviewsCount(reviewsCount)
-                        .build();
+                    if (rating == null || reviewsCount == null || name == null) {
+                        try { Thread.sleep(i * 500L); }
+                        catch (InterruptedException ignored) {}
+                        continue;
+                    }
 
-                if (!cardRepository.existsByUrl(url)) {
-                    MonitoredCard monitoredCard = MonitoredCard.builder()
+                    LocalDate today = LocalDate.now();
+
+                    MonitoredCard card = cardRepository.getMonitoredCardByUserIdAndUrl(userId, url);
+                    if (card == null) {
+                        card = MonitoredCard.builder()
+                                .url(url)
+                                .source(source)
+                                .name(name)
+                                .user(user)
+                                .build();
+                        cardRepository.save(card);
+                    } else {
+                        card.setName(name);
+                    }
+
+                    CardSnapshot snapshot = snapshotRepository.getCardSnapshotByCardAndParsedAt(card, today);
+
+                    if (snapshot == null) {
+                        snapshot = CardSnapshot.builder()
+                                .card(card)
+                                .parsedAt(today)
+                                .build();
+                    }
+
+                    snapshot.setRating(rating);
+                    snapshot.setReviewsCount(reviewsCount);
+
+                    snapshotRepository.save(snapshot);
+
+                    ParseResultDTO resultDTO = ParseResultDTO.builder()
                             .url(url)
-                            .source(source)
                             .name(name)
-                            .user(user)
+                            .source(source)
+                            .rating(rating)
+                            .reviewsCount(reviewsCount)
                             .build();
-                    cardRepository.save(monitoredCard);
-                    snapshot.setCard(monitoredCard);
+
+                    return CompletableFuture.completedFuture(resultDTO);
                 }
-                else {
-
-                    MonitoredCard card = cardRepository.getMonitoredCardByUrl(url);
-
-                    snapshot.setCard(card);
-
-                    CardSnapshot oldSnapshot = isParsedToday(card, snapshot.getParsedAt());
-
-                    if (oldSnapshot != null) {
-
-                        snapshot.setId(oldSnapshot.getId());
-                        snapshotRepository.delete(oldSnapshot);
-
+                catch (Exception e) {
+                    if (i == 2) {
+                        return CompletableFuture.completedFuture(ParseResultDTO.builder()
+                                .url(url)
+                                .errorMessage("Ошибка парсинга: " + e.getMessage())
+                                .build());
                     }
                 }
-
-                snapshotRepository.save(snapshot);
-
-                return CompletableFuture.completedFuture(resultDTO);
             }
-
-
 
             tripCircuit(source);
             return CompletableFuture.completedFuture(ParseResultDTO.builder()
                     .url(url)
                     .errorMessage("Источник заблокирован")
                     .build());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            return CompletableFuture.completedFuture(ParseResultDTO.builder()
+                    .url(url)
+                    .errorMessage("Возникла ошибка сервера")
+                    .build());
         }
-        return CompletableFuture.completedFuture(ParseResultDTO.builder()
-                .url(url)
-                .errorMessage("Возникла ошибка сервера")
-                .build());
     }
 
     private String detectSource(String url) {
@@ -219,7 +222,10 @@ public class AsyncParserService {
 
         String text = doc.select(REVIEWS_COUNT_SELECTORS.get(source)).text();
         if (!text.isEmpty()){
-            return Integer.parseInt(text.split(" ")[0].replace(",", "."));
+            String[] split = text.split(" ");
+            if (source.equals("yandex") && split.length == 1)
+                return Integer.parseInt(text.substring(1, text.length() - 1));
+            return Integer.parseInt(split[0].replace(",", "."));
         }
         return null;
 
@@ -247,12 +253,6 @@ public class AsyncParserService {
             int delay = ThreadLocalRandom.current().nextInt(300, 900);
             Thread.sleep(delay);
         } catch (InterruptedException ignored) {}
-    }
-
-    private CardSnapshot isParsedToday(MonitoredCard card, LocalDate day) {
-
-        return snapshotRepository.getCardSnapshotByCardAndParsedAt(card, day);
-
     }
 
     private boolean isSourceBlocked(String source) {

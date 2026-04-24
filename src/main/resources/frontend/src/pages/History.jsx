@@ -5,6 +5,19 @@ import {getTemplates} from "./Set";
 import {handleTemplateChange} from "./Parser";
 import {validateLinks} from "../util/validateLinks";
 
+export const getSourceMeta = (cards) => {
+    const counts = {};
+    const firstIndexes = {};
+
+    cards.forEach((card, index) => {
+        counts[card.source] = (counts[card.source] || 0) + 1;
+        if (firstIndexes[card.source] === undefined) {
+            firstIndexes[card.source] = index;
+        }
+    });
+
+    return { counts, firstIndexes };
+};
 
 const History = () => {
 
@@ -87,10 +100,8 @@ const History = () => {
 
         try {
             setIsLoading(true);
-            console.log(payload);
             const response = await api.post('/history/get', payload);
             setHistoryResults(response.data);
-            console.log(response);
             setShow(true);
         } catch (e) {
             console.error(e);
@@ -239,20 +250,6 @@ const History = () => {
         };
     };
 
-    const getSourceMeta = (cards) => {
-        const counts = {};
-        const firstIndexes = {};
-
-        cards.forEach((card, index) => {
-            counts[card.source] = (counts[card.source] || 0) + 1;
-            if (firstIndexes[card.source] === undefined) {
-                firstIndexes[card.source] = index;
-            }
-        });
-
-        return { counts, firstIndexes };
-    };
-
     const showHistoryResults = () => {
         const preparedCards = historyResults.map(getPreparedCard);
         const { counts, firstIndexes } = getSourceMeta(preparedCards);
@@ -308,7 +305,7 @@ const History = () => {
                             )}
 
                             <td className="history-table__fixed-end url">
-                                <a href={card.url} target="_blank" rel="noreferrer">
+                                <a href={card.url}>
                                     {card.name}
                                 </a>
                             </td>
