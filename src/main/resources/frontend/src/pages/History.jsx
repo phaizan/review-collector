@@ -204,15 +204,28 @@ const History = () => {
         const firstSnapshot = snapshots[0] ?? null;
         const lastSnapshot = snapshots[snapshots.length - 1] ?? null;
 
-        const reviewsDelta =
-            firstSnapshot && lastSnapshot
-                ? lastSnapshot.reviewsCount - firstSnapshot.reviewsCount
-                : null;
+        let reviewsDelta, ratingDelta;
 
-        const ratingDelta =
-            firstSnapshot && lastSnapshot
-                ? roundToOneDecimal(lastSnapshot.rating - firstSnapshot.rating)
-                : null;
+        console.log(snapshots);
+
+        if (firstSnapshot === lastSnapshot) {
+            console.log(snapshots);
+            console.log(firstSnapshot === lastSnapshot);
+            reviewsDelta = ratingDelta = null;
+            console.log(reviewsDelta);
+            console.log(ratingDelta);
+        }
+        else {
+            reviewsDelta =
+                firstSnapshot && lastSnapshot
+                    ? lastSnapshot.reviewsCount - firstSnapshot.reviewsCount
+                    : null;
+
+            ratingDelta =
+                firstSnapshot && lastSnapshot
+                    ? roundToOneDecimal(lastSnapshot.rating - firstSnapshot.rating)
+                    : null;
+        }
 
         return {
             ...card,
@@ -257,9 +270,11 @@ const History = () => {
                             <th className="history-table__group-end">Рейтинг</th>
                         </React.Fragment>
                     ))}
-
-                    <th rowSpan={2}>Изм. кол-ва отзывов</th>
-                    <th rowSpan={2} className="history-table__group-end">Изм. рейтинга</th>
+                    {dateColumns.length > 1 &&
+                    <>
+                        <th rowSpan={2}>Изм. кол-ва отзывов</th>
+                        <th rowSpan={2} className="history-table__group-end">Изм. рейтинга</th>
+                    </>}
                 </tr>
 
                 <tr>
@@ -313,12 +328,17 @@ const History = () => {
                                 );
                             })}
 
-                            <td className={card.reviewsDeltaClass || ''}>
-                                {card.reviewsDelta == null ? '—' : formatSignedInt(card.reviewsDelta)}
-                            </td>
-                            <td className={`${card.ratingDeltaClass || ''} history-table__group-end`}>
-                                {card.ratingDelta == null ? '—' : formatSignedDouble(card.ratingDelta)}
-                            </td>
+
+                            {dateColumns.length > 1 &&
+                                <>
+                                    <td className={card.reviewsDeltaClass || ''}>
+                                        {card.reviewsDelta == null ? '—' : formatSignedInt(card.reviewsDelta)}
+                                    </td>
+                                    <td className={`${card.ratingDeltaClass || ''} history-table__group-end`}>
+                                        {card.ratingDelta == null ? '—' : formatSignedDouble(card.ratingDelta)}
+                                    </td>
+                                </>}
+
                         </tr>
                     );
                 })}

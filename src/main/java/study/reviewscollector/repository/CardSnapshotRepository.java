@@ -12,4 +12,5 @@ public interface CardSnapshotRepository extends JpaRepository<CardSnapshot, Inte
 
     List<CardSnapshot> getCardSnapshotsByCardAndParsedAtBetweenOrderByParsedAt(MonitoredCard card, LocalDate parsedAtAfter, LocalDate parsedAtBefore);
 
+    CardSnapshot getCardSnapshotByCardAndParsedAt(MonitoredCard card, LocalDate parsedAt);
 }

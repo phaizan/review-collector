@@ -5,13 +5,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import study.reviewscollector.dto.ParseResultDTO;
 import study.reviewscollector.entity.CardSnapshot;
 import study.reviewscollector.entity.MonitoredCard;
 import study.reviewscollector.entity.User;
 import study.reviewscollector.repository.CardSnapshotRepository;
 import study.reviewscollector.repository.MonitoredCardRepository;
-import study.reviewscollector.repository.UserRepository;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -94,7 +94,7 @@ public class AsyncParserService {
             "2gis", new String[]{"h1._1x89xo5", "h1._1rehek"},
             "yandex", new String[]{".card-title-view__title-link", ".orgpage-header-view__header-wrapper .orgpage-header-view__header"}
     );
-
+    @Transactional
     @Async
     public CompletableFuture<ParseResultDTO> parse(String url, User user) {
         try {
@@ -162,7 +162,19 @@ public class AsyncParserService {
                     snapshot.setCard(monitoredCard);
                 }
                 else {
-                    snapshot.setCard(cardRepository.getMonitoredCardByUrl(url));
+
+                    MonitoredCard card = cardRepository.getMonitoredCardByUrl(url);
+
+                    snapshot.setCard(card);
+
+                    CardSnapshot oldSnapshot = isParsedToday(card, snapshot.getParsedAt());
+
+                    if (oldSnapshot != null) {
+
+                        snapshot.setId(oldSnapshot.getId());
+                        snapshotRepository.delete(oldSnapshot);
+
+                    }
                 }
 
                 snapshotRepository.save(snapshot);
@@ -235,6 +247,12 @@ public class AsyncParserService {
             int delay = ThreadLocalRandom.current().nextInt(300, 900);
             Thread.sleep(delay);
         } catch (InterruptedException ignored) {}
+    }
+
+    private CardSnapshot isParsedToday(MonitoredCard card, LocalDate day) {
+
+        return snapshotRepository.getCardSnapshotByCardAndParsedAt(card, day);
+
     }
 
     private boolean isSourceBlocked(String source) {

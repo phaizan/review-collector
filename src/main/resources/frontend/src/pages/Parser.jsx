@@ -4,7 +4,7 @@ import { getTemplates } from "./Set";
 import "./../styles/Parser.css";
 import {validateLinks} from "../util/validateLinks";
 
-//TODO Проверку корректности URL-адресов, добавляемых пользователем.
+//TODO Сделать вывод резульатов также как в истории (группировать и сортировать по источнику)
 
 export const handleTemplateChange = (e, templates, setLinks) => {
     e.preventDefault();
@@ -83,10 +83,9 @@ const Parser = () => {
     const showParseResults = () => {
         return (
             <div className="parser-results">
-                <table className="table parser-table">
+                <table className="table history-table">
                     <thead>
                         <tr>
-                            <th>№</th>
                             <th>Площадка</th>
                             <th>Название</th>
                             <th>Количество отзывов</th>
@@ -94,10 +93,11 @@ const Parser = () => {
                         </tr>
                     </thead>
 
+
+
                     <tbody>
                         {parseResults.map((d, i) => (d &&
                             <tr>
-                                <td>{i + 1}</td>
                                 <td>{d.source}</td>
                                 <td>
                                     <a href={d.url}>
