@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import study.reviewscollector.dto.CardDTO;
-import study.reviewscollector.dto.HistoryRequestDTO;
+import study.reviewscollector.dto.HistoryDTO;
 import study.reviewscollector.dto.SnapshotDTO;
 import study.reviewscollector.entity.CardSnapshot;
 import study.reviewscollector.entity.MonitoredCard;
@@ -23,7 +23,7 @@ public class HistoryService {
     private final CardSnapshotRepository snapshotRepository;
     private final MonitoredCardRepository cardRepository;
 
-    public List<CardDTO> getHistory(HistoryRequestDTO request, Authentication authentication) {
+    public List<CardDTO> getHistory(HistoryDTO request, Authentication authentication) {
 
         User user = (User) authentication.getPrincipal();
 

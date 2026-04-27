@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class HistoryRequestDTO {
+public class HistoryDTO {
 
     private List<String> links;
 

@@ -8,7 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import study.reviewscollector.dto.CardDTO;
-import study.reviewscollector.dto.HistoryRequestDTO;
+import study.reviewscollector.dto.HistoryDTO;
 import study.reviewscollector.dto.SnapshotDTO;
 import org.apache.poi.ss.util.RegionUtil;
 
@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ReportService {
+public class ExportService {
 
     private final HistoryService historyService;
 
-    public byte[] createReport(HistoryRequestDTO request, Authentication authentication) throws IOException {
+    public byte[] exportHistory(HistoryDTO request, Authentication authentication) throws IOException {
         List<CardDTO> cards = historyService.getHistory(request, authentication);
         List<LocalDate> dateColumns = cards.stream()
                 .flatMap(card -> card.getSnapshots().stream())

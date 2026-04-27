@@ -31,6 +31,8 @@ public class MonitoredCard {
 
     private String name;
 
+    private Long organizationId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

@@ -8,6 +8,7 @@ import study.reviewscollector.dto.ParseResultDTO;
 import study.reviewscollector.entity.User;
 import study.reviewscollector.service.ParserService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,7 +20,7 @@ public class ParserController {
     private final ParserService service;
 
     @PostMapping("run")
-    public ResponseEntity<?> runParser(@RequestBody List<String> urls, Authentication authentication) {
+    public ResponseEntity<?> runParser(@RequestBody List<String> urls, Authentication authentication) throws IOException {
 
         User user = (User) authentication.getPrincipal();
 
