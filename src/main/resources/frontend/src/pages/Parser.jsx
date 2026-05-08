@@ -201,10 +201,6 @@ const Parser = () => {
                             </option>
                         ))}
                     </select>
-
-
-                </div>
-                <div className="form-actions">
                 </div>
 
             </form>

@@ -218,7 +218,7 @@ const Set = () => {
             {modalMode === null && message && <>{message}</>}
 
             {modalMode !== null && (
-                <div className="modal-overlay" onClick={() => closeModal()}>
+                <div className="modal-overlay">
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <form onSubmit={(e) => handleModalSubmit(e)}>
                             <h2>{modalConfig[modalMode].title}</h2>
@@ -229,39 +229,39 @@ const Set = () => {
                                 </div>
                             )}
 
-                            {FORM_FIELDS.map((field) => {
-                                const value = template[field.name] ?? '';
-                                const props = {
-                                    key: field.name,
-                                    name: field.name,
-                                    placeholder: field.placeholder,
-                                    className: 'input',
-                                    value,
-                                    required: !isViewMode && field.required,
-                                    readOnly: isViewMode,
-                                    onChange: isViewMode ? undefined : handleFieldChange,
-                                };
+                                {FORM_FIELDS.map((field) => {
+                                    const value = template[field.name] ?? '';
+                                    const props = {
+                                        key: field.name,
+                                        name: field.name,
+                                        placeholder: field.placeholder,
+                                        className: 'input',
+                                        value,
+                                        required: !isViewMode && field.required,
+                                        readOnly: isViewMode,
+                                        onChange: isViewMode ? undefined : handleFieldChange,
+                                    };
 
-                                if (field.type === 'textarea') {
+                                    if (field.type === 'textarea') {
+                                        return (
+                                            <textarea
+                                                {...props}
+                                                rows={field.rows}
+                                                cols={field.cols}
+                                            />
+                                        );
+                                    }
+
                                     return (
-                                        <textarea
+                                        <input
                                             {...props}
-                                            rows={field.rows}
-                                            cols={field.cols}
+                                            type={field.type}
                                         />
                                     );
-                                }
-
-                                return (
-                                    <input
-                                        {...props}
-                                        type={field.type}
-                                    />
-                                );
-                            })}
+                                })}
 
 
-                            <div className="form-actions">
+                            <div className="modal-form-actions">
                                 <button type="button" onClick={closeModal}>
                                     Закрыть
                                 </button>

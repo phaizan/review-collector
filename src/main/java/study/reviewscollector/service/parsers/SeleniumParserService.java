@@ -32,7 +32,7 @@ public class SeleniumParserService {
         String userAgent = ParserService.randomAgent();
         ChromeOptions options = new ChromeOptions();
 
-        options.addArguments("--headless=new");
+        //options.addArguments("--headless=new");
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
@@ -40,20 +40,31 @@ public class SeleniumParserService {
         options.addArguments("user-agent=" + userAgent);
 
         WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         try {
             for (String url : urls) {
 
-                randomDelay();
+                for (int i = 0; i < 2; i++) {
+                    randomDelay();
 
-                ParseResultDTO result = parse(driver, url, source);
-                results.add(result);
+                    ParseResultDTO result = parse(driver, wait, url, source);
+                    if (result.getErrorMessage() == null) {
+                        results.add(result);
+                        break;
+                    }
+                    if (i == 1) {
+                        results.add(result);
+                        break;
+                    }
+                    driver.quit();
+                    driver = new ChromeDriver(options);
+                    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                    randomDelay();
 
-                randomDelay();
+                }
             }
-
         }
-
         finally {
             driver.quit();
         }
@@ -62,30 +73,40 @@ public class SeleniumParserService {
         return CompletableFuture.completedFuture(results);
     }
 
-    public ParseResultDTO parse(WebDriver driver, String url, String source) {
+    public ParseResultDTO parse(WebDriver driver, WebDriverWait wait, String url, String source) {
 
-        try {
-            driver.get(url);
+        for (int i = 0; i < 5; i++) {
+            try {
+                driver.get(url);
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                if ("ozon".equals(source)) {
+                    String text = wait.until(d -> d.findElement(By.cssSelector(".k6v_24 .ga5_3_16-a3")).getText());
+                    System.out.println(text);
+                    break;
+                }
 
-            String name = findFirstNonBlankText(wait, NAME_SELECTORS.get(source));
-            Double rating = Double.parseDouble(driver.findElement(By.cssSelector(RATINGS_SELECTORS.get(source))).getText().replace(',','.'));
-            Integer reviewsCount = Integer.parseInt(driver.findElement(By.cssSelector(REVIEWS_COUNT_SELECTORS.get(source))).getText().split(" ")[0]);
+                String name = findFirstNonBlankText(wait, NAME_SELECTORS.get(source));
+                Double rating = Double.parseDouble(wait.until(d -> d.findElement(By.cssSelector(RATINGS_SELECTORS.get(source))).getText().replace(',','.')));
+                Integer reviewsCount = Integer.parseInt((wait.until(d -> d.findElement(By.cssSelector(REVIEWS_COUNT_SELECTORS.get(source))).getText().split(" ")[0])));
 
-            return ParseResultDTO.builder()
-                    .url(url)
-                    .name(name)
-                    .source(source)
-                    .rating(rating)
-                    .reviewsCount(reviewsCount)
-                    .build();
-        } catch (Exception e) {
-            return ParseResultDTO.builder()
-                    .url(url)
-                    .errorMessage("Ошибка парсинга: " + e.getMessage())
-                    .build();
-}
+                if (name != null) {
+                    return ParseResultDTO.builder()
+                            .url(url)
+                            .name(name)
+                            .source(source)
+                            .rating(rating)
+                            .reviewsCount(reviewsCount)
+                            .build();
+                }
+
+            } catch (Exception e) {
+                System.out.println("Ошибка в ссылке " + url + "\n" + e);
+            }
+        }
+        return ParseResultDTO.builder()
+                .url(url)
+                .errorMessage("Ошибка парсинга")
+                .build();
 
     }
 

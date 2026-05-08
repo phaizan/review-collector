@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 
 @Service
-public class FlampParserService {
+public class ApiParserService {
 
     public static void gis2() throws IOException {
 

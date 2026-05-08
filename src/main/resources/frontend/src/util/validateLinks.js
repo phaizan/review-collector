@@ -5,7 +5,8 @@ const SUPPORTED_HOSTS = [
     'flamp.ru',
     '2gis.ru',
     'yandex.ru',
-    'yandex.com'
+    'yandex.com',
+    'ozon.ru'
 ];
 
 const isSupportedHost = (hostname) => {

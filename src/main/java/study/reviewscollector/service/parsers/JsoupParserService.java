@@ -27,6 +27,8 @@ import static study.reviewscollector.service.ParserService.randomDelay;
 @RequiredArgsConstructor
 public class JsoupParserService {
 
+    private final SeleniumParserService seleniumService;
+
     private static final Map<String, LocalDateTime> CIRCUIT_BREAKER = new ConcurrentHashMap<>();
 
 
@@ -91,11 +93,16 @@ public class JsoupParserService {
                 }
             }
 
-            tripCircuit(source);
-            return CompletableFuture.completedFuture(ParseResultDTO.builder()
-                    .url(url)
-                    .errorMessage("Источник заблокирован")
-                    .build());
+            CompletableFuture<List<ParseResultDTO>> res = seleniumService.parseBatch(new ArrayList<>(List.of(url)), source);
+            if (res.get().get(0).getErrorMessage() == null)
+                return CompletableFuture.completedFuture(res.get().get(0));
+            else {
+                tripCircuit(source);
+                return CompletableFuture.completedFuture(ParseResultDTO.builder()
+                        .url(url)
+                        .errorMessage("Источник заблокирован")
+                        .build());
+            }
         } catch (Exception e) {
             return CompletableFuture.completedFuture(ParseResultDTO.builder()
                     .url(url)

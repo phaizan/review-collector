@@ -25,8 +25,8 @@ public class AsyncConfig {
     @Bean(name = "seleniumExecutor")
     public ThreadPoolTaskExecutor seleniumExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(2);
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(3);
         executor.setQueueCapacity(20);
         executor.setThreadNamePrefix("selenium-");
         executor.setWaitForTasksToCompleteOnShutdown(true);

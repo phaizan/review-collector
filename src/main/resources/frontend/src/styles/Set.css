@@ -1,3 +1,9 @@
+input,
+textarea,
+button,
+select {
+    font: inherit;
+}
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -7,16 +13,60 @@
     background: rgba(0, 0, 0, 0.5); /* затемнение */
     display: flex;
     align-items: center;
+    flex-direction: column;
     justify-content: center;
     z-index: 1000;
 }
 
-.modal-content {
+.modal-content form{
+    display: flex;
+    flex-direction: column;
     background: white;
-    padding: 20px;
+    gap: 20px;
+    padding: 40px;
     border-radius: 12px;
-    min-width: 300px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.modal-content h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.modal-content input {
+    width: auto;
+    padding: 6px 10px;
+    border: 1px solid #000;
+    border-radius: 8px;
+}
+
+.modal-form-actions{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.modal-form-actions button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90px;
+    height: 33px;
+    opacity: 80%;
+    border: none;
+    border-radius: 12px;
+    background: #000000;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    color: #FFFFFF;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .sets-heading {
@@ -29,7 +79,6 @@
 
 .sets-heading__title {
     margin: 0;
-
 }
 
 i {
@@ -45,30 +94,36 @@ i {
     color: #333333;
     transform: translateY(2px);
     transition: color 0.2s ease;
-
 }
 
 i:hover {
     color: black;
+}
 
+.modal-content textarea {
+    box-sizing: border-box;
+    height: 150px;
+    min-height: 100px;
+    width: fit-content;
+    padding: 8px 10px;
+    resize: vertical;
+    background: #FFFFFF;
+    border: 1px solid #000;
+    border-radius: 12px;
+    outline: none;
+
+    line-height: 1.4;
+    color: #000;
 }
 
 .bi-trash3-fill {
-
     color: #dc3545;
     transition: color 0.2s ease;
-
-
 }
 
 .bi-trash3-fill:hover{
-
     color: #fd2020;
-
 }
-
-
-
 
 .sets-heading__add:hover {
     color: #0d6efd;

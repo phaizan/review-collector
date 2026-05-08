@@ -10,11 +10,10 @@ import study.reviewscollector.entity.MonitoredCard;
 import study.reviewscollector.entity.User;
 import study.reviewscollector.repository.CardSnapshotRepository;
 import study.reviewscollector.repository.MonitoredCardRepository;
-import study.reviewscollector.service.parsers.FlampParserService;
+import study.reviewscollector.service.parsers.ApiParserService;
 import study.reviewscollector.service.parsers.JsoupParserService;
 import study.reviewscollector.service.parsers.SeleniumParserService;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +29,7 @@ public class ParserService {
 
     private final JsoupParserService jsoupService;
     private final SeleniumParserService seleniumService;
-    private final FlampParserService flampService;
+    private final ApiParserService flampService;
 
     private final MonitoredCardRepository cardRepository;
     private final CardSnapshotRepository snapshotRepository;
@@ -79,7 +78,7 @@ public class ParserService {
             "otzyvru", "span.count",
             "2gis", "._1pfef7u ._jspzdm",
             "flamp", ".filial-rating__reviews",
-            "yandex", ".business-header-rating-view__text"
+            "yandex", ".sidebar-view__panel .business-header-rating-view__text"
     ));
 
     public static final HashMap<String, String> RATINGS_SELECTORS = new HashMap<>(Map.of(
@@ -88,7 +87,7 @@ public class ParserService {
             "otzyvru", ".average",
             "flamp", ".filial-rating__value",
             "2gis", "._1pfef7u ._y10azs",
-            "yandex", ".business-header-rating-view .business-rating-badge-view__rating-text"
+            "yandex", ".sidebar-view__panel .business-header-rating-view .business-rating-badge-view__rating-text"
     ));
 
     public static final Map<String, String[]> NAME_SELECTORS = Map.of(
@@ -97,7 +96,7 @@ public class ParserService {
             "otzyvru", new String[]{".element_name"},
             "flamp", new String[]{".header-filial__name"},
             "2gis", new String[]{"h1._1x89xo5", "h1._1rehek"},
-            "yandex", new String[]{".card-title-view__title-link", ".orgpage-header-view__header-wrapper .orgpage-header-view__header"}
+            "yandex", new String[]{".card-title-view__title-link", ".card-title-view__title", ".orgpage-header-view__header-wrapper .orgpage-header-view__header"}
     );
 
     public List<ParseResultDTO> parseAll(List<String> urls, User user) {
@@ -105,7 +104,7 @@ public class ParserService {
         //JsoupParserService.gis2();
 
         HashMap<String, List<String>> map = new HashMap<>();
-        Set<String> seleniumSources = Set.of("yandex");
+        Set<String> seleniumSources = Set.of("yandex", "ozon");
 
         for (String url : urls) {
             String source = detectSource(url);
@@ -213,7 +212,7 @@ public class ParserService {
 
 
     private String detectSource(String url) {
-        HashSet<String> sources = new HashSet<>(Set.of("otzovik", "irecommend", "otzyvru", "flamp", "2gis", "yandex"));
+        HashSet<String> sources = new HashSet<>(Set.of("otzovik", "irecommend", "otzyvru", "flamp", "2gis", "yandex", "ozon"));
         return sources.stream()
                 .filter(url::contains)
                 .findFirst().orElse(null);

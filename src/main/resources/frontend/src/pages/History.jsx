@@ -75,11 +75,36 @@ const History = () => {
         )
     )].sort();
 
+    const checkDates = () => {
+
+        console.log("Привет");
+        console.log(request.dateTo);
+        console.log(request.dateFrom);
+        console.log(request.links);
+        if (request.dateTo === null || request.dateFrom === null) {
+            setMessage("Введите даты");
+            return false;
+        }
+        if (request.dateFrom === null > request.dateTo === null) {
+            setMessage("Неправильны введены даты");
+            return false;
+        }
+        if (links === null) {
+            setMessage("Введите ссылки");
+            return false;
+        }
+        return true;
+
+    }
+
     const loadHistory = async (e) => {
 
         e.preventDefault();
         setMessage("");
         setShow(false)
+
+        if (!checkDates())
+            return;
 
         const validation = validateLinks(links);
 
@@ -411,6 +436,7 @@ const History = () => {
                         className="history-form__textarea"
                         placeholder="Введите список ссылок"
                         value={links}
+                        required="true"
                         onChange={e => setLinks(e.target.value)}
                     ></textarea>
                 </form>
